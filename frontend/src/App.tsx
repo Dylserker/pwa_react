@@ -99,22 +99,24 @@ function App() {
       {/* Section favoris */}
       {favorites.length > 0 && (
         <section className="favorites-section">
-          <h2>⭐ Favoris</h2>
-          <ul className="favorites-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', listStyle: 'none', padding: 0 }}>
-            {favorites.map((fav) => {
-              const cityOnly = fav.split(',')[0];
-              return (
-                <li key={fav} style={{ display: 'flex', alignItems: 'center' }}>
-                  <button onClick={() => searchCity(cityOnly)} className="favorite-btn">{cityOnly}</button>
-                  <span
-                    onClick={() => removeFavorite(fav)}
-                    title="Retirer des favoris"
-                    style={{ cursor: 'pointer', marginLeft: 8 }}
-                  >❌</span>
-                </li>
-              );
-            })}
-          </ul>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span style={{ fontSize: '1.2em', marginRight: 8 }}>⭐ Favoris :</span>
+            <ul className="favorites-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', listStyle: 'none', padding: 0, margin: 0 }}>
+              {favorites.map((fav) => {
+                const cityOnly = fav.split(',')[0];
+                return (
+                  <li key={fav} style={{ display: 'flex', alignItems: 'center' }}>
+                    <button onClick={() => searchCity(cityOnly)} className="favorite-btn">{cityOnly}</button>
+                    <span
+                      onClick={() => removeFavorite(fav)}
+                      title="Retirer des favoris"
+                      style={{ cursor: 'pointer', marginLeft: 8 }}
+                    >❌</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
       )}
 
