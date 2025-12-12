@@ -12,22 +12,8 @@
 }
 
 .dark .app-main {
-  background: #181a1b !important;
-}
-
-.dark .search-bar {
-  background: #23272a;
-  border-radius: 10px;
-  padding: 1rem;
-}
-.dark .search-input {
-  background: #f1f1f1;
-  color: #181a1b;
-  border: 2px solid var(--border-color);
-}
-.dark .search-input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(144, 202, 249, 0.1);
+  background: #222222;
+  color: var(--text-primary);
 }
 
 .dark .weather-section {
