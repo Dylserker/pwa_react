@@ -22,10 +22,22 @@
   box-shadow: var(--shadow);
 }
 
+.dark .city-name {
+  color: var(--text-primary);
+}
+
 .dark .hourly-forecast {
   background: #3b3b3b;
   color: var(--text-primary);
   box-shadow: var(--shadow);
+}
+
+.dark .h3 {
+  color: var(--text-primary);
+}
+
+.dark .hourly-time {
+  color: var(--text-primary);
 }
 
 /* ===== Dark Mode Variables ===== */
