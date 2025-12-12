@@ -113,12 +113,13 @@ function App() {
             <WeatherDisplay
               cityName={currentCity.name}
               data={weatherData}
-              isFavorite={isFavorite(currentCity.name)}
-              onToggleFavorite={(city) => {
-                if (isFavorite(city)) {
-                  removeFavorite(city);
+              isFavorite={isFavorite(currentCity.name.split(',')[0].trim())}
+              onToggleFavorite={() => {
+                const cityOnly = currentCity.name.split(',')[0].trim();
+                if (isFavorite(cityOnly)) {
+                  removeFavorite(cityOnly);
                 } else {
-                  addFavorite(city);
+                  addFavorite(cityOnly);
                 }
               }}
             />
