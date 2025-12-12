@@ -14,6 +14,12 @@ import { DarkModeToggle } from './components/DarkModeToggle';
 import { useNotifications } from './hooks/useNotifications';
 
 function App() {
+    // Affichage d'un bandeau si hors ligne
+    const offlineBanner = isOffline ? (
+      <div style={{ background: '#ff9800', color: '#fff', padding: '8px', textAlign: 'center', fontWeight: 'bold' }}>
+        ⚠️ Vous êtes hors ligne. Affichage des dernières données météo enregistrées.
+      </div>
+    ) : null;
   const { currentCity, weatherData, loading, error, searchCity, clearError } = useWeather();
   const { permissionStatus, sendNotification } = useNotifications();
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
@@ -67,6 +73,7 @@ function App() {
 
   return (
     <div className="app-container">
+      {offlineBanner}
       <header className="app-header">
         <h1>🌤️ MétéoPWA</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -74,7 +81,6 @@ function App() {
           <DarkModeToggle />
         </div>
       </header>
-
 
       <main className="app-main">
         <section className="search-section">
@@ -108,47 +114,35 @@ function App() {
         )}
 
         {error && (
-          <div className="error-message" role="alert">
-            <p>{error}</p>
-            <button onClick={clearError}>Fermer</button>
+          <div className="error-message" role="alert" onClick={clearError} title="Cliquez pour fermer">
+            {error}
           </div>
         )}
 
-        {loading && (
-          <div className="loading" role="status">
-            <p>⏳ Chargement des données...</p>
-          </div>
-        )}
-
-        {weatherData && currentCity && (
-          <>
-            <WeatherDisplay
-              cityName={currentCity.name}
-              data={weatherData}
-              isFavorite={isFavorite(currentCity.name.split(',')[0].trim())}
-              onToggleFavorite={() => {
-                const cityOnly = currentCity.name.split(',')[0].trim();
-                if (isFavorite(cityOnly)) {
-                  removeFavorite(cityOnly);
-                } else {
-                  addFavorite(cityOnly);
-                }
-              }}
-            />
-            <HourlyForecast data={weatherData} />
-          </>
-        )}
-
-        {!loading && !weatherData && !error && (
-          <div className="welcome-message">
-            <p>Bienvenue sur MétéoPWA ! 👋</p>
-            <p>Recherchez une ville pour voir la météo actuelle et les prévisions.</p>
-          </div>
-        )}
+        <WeatherDisplay
+          cityName={currentCity?.name || ''}
+          data={weatherData as any}
+          isFavorite={!!currentCity && isFavorite(currentCity.name)}
+          onToggleFavorite={currentCity ? () => (isFavorite(currentCity.name) ? removeFavorite(currentCity.name) : addFavorite(currentCity.name)) : undefined}
+        />
+        <HourlyForecast data={weatherData as any} />
       </main>
+
+      <section className="favorites">
+        <h2>Favoris</h2>
+        <ul>
+          {favorites.map((fav) => (
+            <li key={fav}>
+              <button onClick={() => handleSearch(fav)}>{fav}</button>
+              <span onClick={() => removeFavorite(fav)} title="Retirer des favoris">❌</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <footer className="app-footer">
         <p>Données fournies par Open-Meteo</p>
+        <p>Application météo PWA - 2025</p>
       </footer>
     </div>
   );
