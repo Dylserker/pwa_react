@@ -55,8 +55,14 @@ class NotificationService {
      * Envoyer une notification météo
      */
     sendWeatherNotification(city: string, message: string, type: NotificationType = 'info'): void {
+        const typeIcons: Record<NotificationType, string> = {
+            rain: '🌧️',
+            temp: '🌡️',
+            info: 'ℹ️'
+        };
+
         this.send(`MétéoPWA - ${city}`, {
-            body: message,
+             body: `${typeIcons[type]} ${message}`,
             tag: `weather-${type}`,
             requireInteraction: false
         });
