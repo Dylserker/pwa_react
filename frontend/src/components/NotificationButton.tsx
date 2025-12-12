@@ -38,7 +38,7 @@ export const NotificationButton: React.FC = () => {
 		return 'notify-btn';
 	};
 
-	const isDisabled = permissionStatus === 'denied';
+	const isDisabled = permissionStatus === 'denied'; // Correction : le bouton n'est désactivé que si la permission est 'denied'
 
     const handleClick = async () => {
         if (permissionStatus === 'denied') return;

@@ -6,6 +6,7 @@ import { SearchBar } from './components/SearchBar';
 import { WeatherDisplay } from './components/WeatherDisplay';
 import { HourlyForecast } from './components/HourlyForecast';
 import { NotificationButton } from './components/NotificationButton';
+import { DarkModeToggle } from './components/DarkModeToggle';
 
 function App() {
   const { currentCity, weatherData, loading, error, searchCity, clearError } = useWeather();
@@ -28,7 +29,10 @@ function App() {
     <div className="app-container">
       <header className="app-header">
         <h1>🌤️ MétéoPWA</h1>
-        <NotificationButton />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <NotificationButton />
+          <DarkModeToggle />
+        </div>
       </header>
 
       <main className="app-main">
