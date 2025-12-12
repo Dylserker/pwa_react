@@ -13,7 +13,7 @@ class ServiceWorkerService {
         }
 
         try {
-            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            const registration = await navigator.serviceWorker.register('/pwa_react/service-worker.js');
             console.log('✅ Service Worker enregistré:', registration.scope);
             return registration;
         } catch (error) {
