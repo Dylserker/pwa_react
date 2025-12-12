@@ -101,16 +101,20 @@ function App() {
         <section className="favorites-section">
           <h2>⭐ Favoris</h2>
           <ul className="favorites-list">
-            {favorites.map((fav) => (
-              <li key={fav}>
-                <button onClick={() => searchCity(fav)} className="favorite-btn">{fav}</button>
-                <span
-                  onClick={() => removeFavorite(fav)}
-                  title="Retirer des favoris"
-                  style={{ cursor: 'pointer', marginLeft: 8 }}
-                >❌</span>
-              </li>
-            ))}
+            {favorites.map((fav) => {
+              // Affiche uniquement le nom de la ville (avant la virgule s'il y en a)
+              const cityOnly = fav.split(',')[0];
+              return (
+                <li key={fav}>
+                  <button onClick={() => searchCity(cityOnly)} className="favorite-btn">{cityOnly}</button>
+                  <span
+                    onClick={() => removeFavorite(fav)}
+                    title="Retirer des favoris"
+                    style={{ cursor: 'pointer', marginLeft: 8 }}
+                  >❌</span>
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
