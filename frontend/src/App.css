@@ -23,7 +23,7 @@
 }
 
 .dark .city-name {
-  color: var(--text-primary);
+  color: white;
 }
 
 .dark .hourly-forecast {
@@ -33,11 +33,11 @@
 }
 
 .dark .h3 {
-  color: var(--text-primary);
+  color: white;
 }
 
 .dark .hourly-time {
-  color: var(--text-primary);
+  color: white;
 }
 
 /* ===== Dark Mode Variables ===== */
