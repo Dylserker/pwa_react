@@ -100,12 +100,11 @@ function App() {
       {favorites.length > 0 && (
         <section className="favorites-section">
           <h2>⭐ Favoris</h2>
-          <ul className="favorites-list">
+          <ul className="favorites-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', listStyle: 'none', padding: 0 }}>
             {favorites.map((fav) => {
-              // Affiche uniquement le nom de la ville (avant la virgule s'il y en a)
               const cityOnly = fav.split(',')[0];
               return (
-                <li key={fav}>
+                <li key={fav} style={{ display: 'flex', alignItems: 'center' }}>
                   <button onClick={() => searchCity(cityOnly)} className="favorite-btn">{cityOnly}</button>
                   <span
                     onClick={() => removeFavorite(fav)}
