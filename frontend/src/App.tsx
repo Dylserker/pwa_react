@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import './App.css';
 import { useWeather } from './hooks/useWeather';
+import { WEATHER_EMOJIS } from './config/weatherConfig';
 import { serviceWorkerService } from './services/serviceWorkerService';
 import { SearchBar } from './components/SearchBar';
 import { WeatherDisplay } from './components/WeatherDisplay';
@@ -30,12 +31,25 @@ function App() {
   // Fonction pour gérer la recherche et la notification
   const handleSearch = useCallback(async (query: string) => {
     await searchCity(query);
-    // Si notifications activées, envoyer une notification météo
+    // Si notifications activées, envoyer une notification météo détaillée
     const notifEnabled = localStorage.getItem('notifications-enabled') === 'true';
     if (permissionStatus === 'granted' && notifEnabled && query) {
-      sendNotification('Recherche météo', { body: `Voici la météo pour ${query} !` });
+      // Récupérer les données météo après la recherche
+      setTimeout(() => {
+        // On relit les données du hook (elles sont mises à jour après searchCity)
+        const temp = weatherData?.current?.temperature_2m;
+        const code = weatherData?.current?.weather_code;
+        const emoji = code !== undefined ? WEATHER_EMOJIS[code as keyof typeof WEATHER_EMOJIS] || '' : '';
+        if (temp !== undefined && code !== undefined) {
+          sendNotification(`Météo à ${query}`, {
+            body: `${emoji} ${temp}°C actuellement.`
+          });
+        } else {
+          sendNotification('Recherche météo', { body: `Voici la météo pour ${query} !` });
+        }
+      }, 200);
     }
-  }, [searchCity, permissionStatus, sendNotification]);
+  }, [searchCity, permissionStatus, sendNotification, weatherData]);
 
   return (
     <div className="app-container">
