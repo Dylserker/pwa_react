@@ -1,4 +1,6 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
+  // État pour savoir si l'utilisateur est hors ligne
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 import { useFavorites } from './hooks/useFavorites';
 import './App.css';
 import { useWeather } from './hooks/useWeather';
@@ -19,7 +21,7 @@ function App() {
   useEffect(() => {
     // Initialiser le Service Worker au chargement
     serviceWorkerService.register();
-    
+
     // Ajouter le manifest au head
     const manifest = document.querySelector('link[rel="manifest"]');
     if (!manifest) {
@@ -28,6 +30,16 @@ function App() {
       link.href = '/pwa_react/manifest.json';
       document.head.appendChild(link);
     }
+
+    // Gérer l'état en ligne/hors ligne
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Fonction pour gérer la recherche et la notification

@@ -36,19 +36,39 @@ export function useWeather(): UseWeatherReturn {
 
         try {
             const result = await weatherService.searchCity(trimmedQuery);
-            
-            setCurrentCity({
+
+            const cityObj = {
                 name: result.cityName,
                 lat: result.city.latitude,
                 lon: result.city.longitude
-            });
-            
+            };
+            setCurrentCity(cityObj);
             setWeatherData(result.weather);
-            
+
+            // Sauvegarde dans le localStorage
+            localStorage.setItem('lastWeather', JSON.stringify({
+                city: cityObj,
+                weather: result.weather,
+                timestamp: Date.now()
+            }));
+
             // Vérifier les alertes météo
             checkWeatherAlerts(result.weather, result.cityName);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+            // Si erreur réseau, tenter de charger la dernière météo stockée
+            const cached = localStorage.getItem('lastWeather');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    setCurrentCity(parsed.city);
+                    setWeatherData(parsed.weather);
+                    setError('Affichage des dernières données météo enregistrées (hors ligne).');
+                } catch (e) {
+                    setError('Impossible de lire les données locales.');
+                }
+            } else {
+                setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+            }
         } finally {
             setLoading(false);
         }
