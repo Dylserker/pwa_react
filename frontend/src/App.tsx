@@ -31,9 +31,11 @@ function App() {
         <h1>🌤️ MétéoPWA</h1>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <NotificationButton />
-          <DarkModeToggle />
         </div>
       </header>
+      <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000 }}>
+        <DarkModeToggle />
+      </div>
 
       <main className="app-main">
         <section className="search-section">
