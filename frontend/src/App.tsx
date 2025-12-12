@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react';
+import './App.css';
+import { useWeather } from './hooks/useWeather';
+import { serviceWorkerService } from './services/serviceWorkerService';
+import { SearchBar } from './components/SearchBar';
+import { WeatherDisplay } from './components/WeatherDisplay';
+import { HourlyForecast } from './components/HourlyForecast';
+import { NotificationButton } from './components/NotificationButton';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { currentCity, weatherData, loading, error, searchCity, clearError } = useWeather();
+
+  useEffect(() => {
+    // Initialiser le Service Worker au chargement
+    serviceWorkerService.register();
+    
+    // Ajouter le manifest au head
+    const manifest = document.querySelector('link[rel="manifest"]');
+    if (!manifest) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = '/manifest.json';
+      document.head.appendChild(link);
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app-container">
+      <header className="app-header">
+        <h1>🌤️ MétéoPWA</h1>
+        <NotificationButton />
+      </header>
+
+      <main className="app-main">
+        <section className="search-section">
+          <SearchBar onSearch={searchCity} disabled={loading} />
+        </section>
+
+        {error && (
+          <div className="error-message" role="alert">
+            <p>{error}</p>
+            <button onClick={clearError}>Fermer</button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="loading" role="status">
+            <p>⏳ Chargement des données...</p>
+          </div>
+        )}
+
+        {weatherData && currentCity && (
+          <>
+            <WeatherDisplay cityName={currentCity.name} data={weatherData} />
+            <HourlyForecast data={weatherData} />
+          </>
+        )}
+
+        {!loading && !weatherData && !error && (
+          <div className="welcome-message">
+            <p>Bienvenue sur MétéoPWA ! 👋</p>
+            <p>Recherchez une ville pour voir la météo actuelle et les prévisions.</p>
+          </div>
+        )}
+      </main>
+
+      <footer className="app-footer">
+        <p>Données fournies par Open-Meteo</p>
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;
