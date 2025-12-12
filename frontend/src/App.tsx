@@ -1,6 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
-  // État pour savoir si l'utilisateur est hors ligne
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+import { useEffect, useCallback } from 'react';
 import { useFavorites } from './hooks/useFavorites';
 import './App.css';
 import { useWeather } from './hooks/useWeather';
@@ -14,12 +12,6 @@ import { DarkModeToggle } from './components/DarkModeToggle';
 import { useNotifications } from './hooks/useNotifications';
 
 function App() {
-    // Affichage d'un bandeau si hors ligne
-    const offlineBanner = isOffline ? (
-      <div style={{ background: '#ff9800', color: '#fff', padding: '8px', textAlign: 'center', fontWeight: 'bold' }}>
-        ⚠️ Vous êtes hors ligne. Affichage des dernières données météo enregistrées.
-      </div>
-    ) : null;
   const { currentCity, weatherData, loading, error, searchCity, clearError } = useWeather();
   const { permissionStatus, sendNotification } = useNotifications();
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
@@ -27,7 +19,7 @@ function App() {
   useEffect(() => {
     // Initialiser le Service Worker au chargement
     serviceWorkerService.register();
-
+    
     // Ajouter le manifest au head
     const manifest = document.querySelector('link[rel="manifest"]');
     if (!manifest) {
@@ -36,16 +28,6 @@ function App() {
       link.href = '/pwa_react/manifest.json';
       document.head.appendChild(link);
     }
-
-    // Gérer l'état en ligne/hors ligne
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, []);
 
   // Fonction pour gérer la recherche et la notification
@@ -73,7 +55,6 @@ function App() {
 
   return (
     <div className="app-container">
-      {offlineBanner}
       <header className="app-header">
         <h1>🌤️ MétéoPWA</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -87,70 +68,63 @@ function App() {
           <SearchBar onSearch={handleSearch} disabled={loading} />
         </section>
 
-        {favorites.length > 0 && (
-          <section style={{ marginBottom: '2rem' }}>
-            <h3>⭐ Vos villes favorites</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {favorites.map((fav) => (
-                <button
-                  key={fav}
-                  onClick={() => handleSearch(fav)}
-                  style={{
-                    background: '#fffbe6',
-                    border: '1px solid #FFD700',
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    color: '#b8860b',
-                  }}
-                  title={`Voir la météo pour ${fav}`}
-                >
-                  ★ {fav}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
         {error && (
-          <div className="error-message" role="alert" onClick={clearError} title="Cliquez pour fermer">
-            {error}
+          <div className="error-message" role="alert">
+            <p>{error}</p>
+            <button onClick={clearError}>Fermer</button>
           </div>
         )}
 
-        {weatherData ? (
+        {loading && (
+          <div className="loading" role="status">
+            <p>⏳ Chargement des données...</p>
+          </div>
+        )}
+
+        {weatherData && currentCity && (
           <>
             <WeatherDisplay
-              cityName={currentCity?.name || ''}
+              cityName={currentCity.name}
               data={weatherData}
-              isFavorite={!!currentCity && isFavorite(currentCity.name)}
-              onToggleFavorite={currentCity ? () => (isFavorite(currentCity.name) ? removeFavorite(currentCity.name) : addFavorite(currentCity.name)) : undefined}
+              isFavorite={isFavorite(currentCity.name)}
+              onToggleFavorite={() =>
+                isFavorite(currentCity.name)
+                  ? removeFavorite(currentCity.name)
+                  : addFavorite(currentCity.name)
+              }
             />
             <HourlyForecast data={weatherData} />
           </>
-        ) : (
-          <div style={{textAlign: 'center', margin: '2rem 0', color: '#888'}}>
-            <p>Bienvenue sur MétéoPWA !<br/>Recherchez une ville pour afficher la météo.</p>
+        )}
+      {/* Section favoris */}
+      {favorites.length > 0 && (
+        <section className="favorites-section">
+          <h2>⭐ Favoris</h2>
+          <ul className="favorites-list">
+            {favorites.map((fav) => (
+              <li key={fav}>
+                <button onClick={() => searchCity(fav)} className="favorite-btn">{fav}</button>
+                <span
+                  onClick={() => removeFavorite(fav)}
+                  title="Retirer des favoris"
+                  style={{ cursor: 'pointer', marginLeft: 8 }}
+                >❌</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+        {!loading && !weatherData && !error && (
+          <div className="welcome-message">
+            <p>Bienvenue sur MétéoPWA ! 👋</p>
+            <p>Recherchez une ville pour voir la météo actuelle et les prévisions.</p>
           </div>
         )}
       </main>
 
-      <section className="favorites">
-        <h2>Favoris</h2>
-        <ul>
-          {favorites.map((fav) => (
-            <li key={fav}>
-              <button onClick={() => handleSearch(fav)}>{fav}</button>
-              <span onClick={() => removeFavorite(fav)} title="Retirer des favoris">❌</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <footer className="app-footer">
         <p>Données fournies par Open-Meteo</p>
-        <p>Application météo PWA - 2025</p>
       </footer>
     </div>
   );
