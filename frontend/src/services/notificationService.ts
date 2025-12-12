@@ -40,12 +40,24 @@ class NotificationService {
     /**
      * Envoyer une notification
      */
-    send(title: string, options?: NotificationOptions): void {
+    async send(title: string, options?: NotificationOptions): Promise<void> {
         if (!this.isSupported()) return;
 
         if (Notification.permission === 'granted') {
+            // Si le SW est actif, utiliser showNotification
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                const reg = await navigator.serviceWorker.getRegistration();
+                if (reg) {
+                    reg.showNotification(title, {
+                        icon: '/pwa_react/icons/icon-192.png',
+                        ...options
+                    });
+                    return;
+                }
+            }
+            // Fallback navigateur classique
             new Notification(title, {
-                icon: 'icons/icon-192.png',
+                icon: '/pwa_react/icons/icon-192.png',
                 ...options
             });
         }
