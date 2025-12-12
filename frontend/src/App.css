@@ -5,8 +5,9 @@
 }
 
 .dark .app-header {
-  background: linear-gradient(135deg, #23272a, #181a1b);
-  color: var(--text-primary);
+  /* Le header conserve son dégradé bleu même en dark mode */
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
   box-shadow: var(--shadow);
 }
 
