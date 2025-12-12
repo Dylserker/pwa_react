@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { WEATHER_EMOJIS, WEATHER_CONFIG } from '../config/weatherConfig';
+import { WEATHER_EMOJIS } from '../config/weatherConfig';
 import type { WeatherData } from '../types/weather';
 
 interface WeatherDisplayProps {
