@@ -9,9 +9,11 @@ import type { WeatherData } from '../types/weather';
 interface WeatherDisplayProps {
     cityName: string;
     data: WeatherData;
+    isFavorite?: boolean;
+    onToggleFavorite?: (city: string) => void;
 }
 
-export const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ cityName, data }) => {
+export const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ cityName, data, isFavorite, onToggleFavorite }) => {
     const current = data.current;
 
     const getWeatherEmoji = (code: number): string => {
@@ -20,8 +22,26 @@ export const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ cityName, data }
 
     return (
         <div className="weather-section">
-            <h2 className="city-name">{cityName}</h2>
-            
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h2 className="city-name">{cityName}</h2>
+                {onToggleFavorite && (
+                  <button
+                    aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                    onClick={() => onToggleFavorite(cityName)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '2rem',
+                      cursor: 'pointer',
+                      color: isFavorite ? '#FFD700' : '#bbb',
+                      marginLeft: '1rem',
+                    }}
+                    title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                  >
+                    {isFavorite ? '★' : '☆'}
+                  </button>
+                )}
+            </div>
             <div className="weather-current">
                 <div className="weather-icon">
                     {getWeatherEmoji(current.weather_code)}

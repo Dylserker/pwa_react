@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import { useFavorites } from './hooks/useFavorites';
 import './App.css';
 import { useWeather } from './hooks/useWeather';
 import { WEATHER_EMOJIS } from './config/weatherConfig';
@@ -13,6 +14,7 @@ import { useNotifications } from './hooks/useNotifications';
 function App() {
   const { currentCity, weatherData, loading, error, searchCity, clearError } = useWeather();
   const { permissionStatus, sendNotification } = useNotifications();
+  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     // Initialiser le Service Worker au chargement
@@ -61,10 +63,37 @@ function App() {
         </div>
       </header>
 
+
       <main className="app-main">
         <section className="search-section">
           <SearchBar onSearch={handleSearch} disabled={loading} />
         </section>
+
+        {favorites.length > 0 && (
+          <section style={{ marginBottom: '2rem' }}>
+            <h3>⭐ Vos villes favorites</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {favorites.map((fav) => (
+                <button
+                  key={fav}
+                  onClick={() => handleSearch(fav)}
+                  style={{
+                    background: '#fffbe6',
+                    border: '1px solid #FFD700',
+                    borderRadius: '8px',
+                    padding: '0.5rem 1rem',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: '#b8860b',
+                  }}
+                  title={`Voir la météo pour ${fav}`}
+                >
+                  ★ {fav}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {error && (
           <div className="error-message" role="alert">
@@ -81,7 +110,18 @@ function App() {
 
         {weatherData && currentCity && (
           <>
-            <WeatherDisplay cityName={currentCity.name} data={weatherData} />
+            <WeatherDisplay
+              cityName={currentCity.name}
+              data={weatherData}
+              isFavorite={isFavorite(currentCity.name)}
+              onToggleFavorite={(city) => {
+                if (isFavorite(city)) {
+                  removeFavorite(city);
+                } else {
+                  addFavorite(city);
+                }
+              }}
+            />
             <HourlyForecast data={weatherData} />
           </>
         )}
