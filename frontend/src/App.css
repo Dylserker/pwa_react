@@ -32,7 +32,7 @@
   box-shadow: var(--shadow);
 }
 
-.dark .h3 {
+.dark h3 {
   color: white;
 }
 
