@@ -17,7 +17,13 @@
 }
 
 .dark .weather-section {
-  background-color: var(--surface);
+  background: #3b3b3b;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+
+.dark .hourly-forecast {
+  background: #3b3b3b;
   color: var(--text-primary);
   box-shadow: var(--shadow);
 }
