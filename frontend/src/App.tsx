@@ -119,13 +119,21 @@ function App() {
           </div>
         )}
 
-        <WeatherDisplay
-          cityName={currentCity?.name || ''}
-          data={weatherData as any}
-          isFavorite={!!currentCity && isFavorite(currentCity.name)}
-          onToggleFavorite={currentCity ? () => (isFavorite(currentCity.name) ? removeFavorite(currentCity.name) : addFavorite(currentCity.name)) : undefined}
-        />
-        <HourlyForecast data={weatherData as any} />
+        {weatherData ? (
+          <>
+            <WeatherDisplay
+              cityName={currentCity?.name || ''}
+              data={weatherData}
+              isFavorite={!!currentCity && isFavorite(currentCity.name)}
+              onToggleFavorite={currentCity ? () => (isFavorite(currentCity.name) ? removeFavorite(currentCity.name) : addFavorite(currentCity.name)) : undefined}
+            />
+            <HourlyForecast data={weatherData} />
+          </>
+        ) : (
+          <div style={{textAlign: 'center', margin: '2rem 0', color: '#888'}}>
+            <p>Bienvenue sur MétéoPWA !<br/>Recherchez une ville pour afficher la météo.</p>
+          </div>
+        )}
       </main>
 
       <section className="favorites">
