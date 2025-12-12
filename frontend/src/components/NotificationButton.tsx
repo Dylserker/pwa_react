@@ -2,11 +2,21 @@
  * Composant de bouton pour gérer les notifications
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotifications } from '../hooks/useNotifications';
 
 export const NotificationButton: React.FC = () => {
     const { isSupported, permissionStatus, requestPermission } = useNotifications();
+	const [enabled, setEnabled] = useState<boolean>(() => {
+		const stored = localStorage.getItem('notifications-enabled');
+		if (stored !== null) return stored === 'true';
+		return permissionStatus === 'granted';
+	});
+
+	// Synchroniser l'état local avec localStorage
+	useEffect(() => {
+		localStorage.setItem('notifications-enabled', String(enabled));
+	}, [enabled]);
 
     if (!isSupported) {
         return (
@@ -16,32 +26,38 @@ export const NotificationButton: React.FC = () => {
         );
     }
 
-    const getButtonContent = (): string => {
-        switch (permissionStatus) {
-            case 'granted':
-                return '✅ Notifications activées';
-            case 'denied':
-                return '❌ Notifications bloquées';
-            default:
-                return '🔔 Activer les notifications';
-        }
+	const getButtonContent = (): string => {
+		if (permissionStatus === 'denied') return '❌ Notifications bloquées';
+		if (enabled) return '✅ Notifications activées (cliquer pour désactiver)';
+		return '🔔 Activer les notifications';
+	};
+
+	const getButtonClass = (): string => {
+		if (permissionStatus === 'denied') return 'notify-btn denied';
+		if (enabled) return 'notify-btn granted';
+		return 'notify-btn';
+	};
+
+	const isDisabled = permissionStatus === 'denied';
+
+    const handleClick = async () => {
+        if (permissionStatus === 'denied') return;
+		if (enabled) {
+			// Désactivation locale (l'utilisateur doit gérer la permission navigateur pour un vrai blocage)
+			setEnabled(false);
+		} else {
+			await requestPermission();
+			setEnabled(true);
+		}
     };
 
-    const getButtonClass = (): string => {
-        if (permissionStatus === 'granted') return 'notify-btn granted';
-        if (permissionStatus === 'denied') return 'notify-btn denied';
-        return 'notify-btn';
-    };
-
-    const isDisabled = permissionStatus === 'denied' || permissionStatus === 'granted';
-
-    return (
-        <button
-            onClick={requestPermission}
-            disabled={isDisabled}
-            className={getButtonClass()}
-        >
-            {getButtonContent()}
-        </button>
-    );
+	return (
+		<button
+			onClick={handleClick}
+			disabled={isDisabled}
+			className={getButtonClass()}
+		>
+			{getButtonContent()}
+		</button>
+	);
 };
